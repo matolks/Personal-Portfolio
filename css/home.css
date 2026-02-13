@@ -172,9 +172,9 @@ canvas {
   align-self: stretch; 
 }
 
-.fadeIn { opacity: 0; transition: opacity 5s ease; }
-.fadeIn[id="1"] { transition-duration: 6s; }
-.fadeIn[id="2"] { transition-duration: 7s; }
+.fadeIn { opacity: 0; transition: opacity var(--dur, 1s) cubic-bezier(0.7, 0, 0.84, 0); will-change: opacity; }
+.fadeIn[id="1"] { transition-duration: 2s; }
+.fadeIn[id="2"] { transition-duration: 3s; }
 .fadeIn.show { opacity: 1; }
 
 /* moving list */

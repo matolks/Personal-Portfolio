@@ -109,8 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function onFirstMouseMove() {
     if (started) return;
     started = true;
-    const margin = 375;
-    tx = 1.5 * margin;
+    const margin = 200;
+    tx = 2 * margin;
     ty = margin;
     startLoop();
     Array.from(fader).forEach((el) => el.classList.add("show"));
