@@ -1,11 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // tetris
-  document.addEventListener("keydown", function (key) {
-    if (key.keyCode == 32) {
-      // window.location.href = "pong.html";
-    }
-  });
-
   ////// BUTTONS //////
   document.querySelector("#gitHub").addEventListener("click", () => {
     window.open("https://github.com/matolks", "_blank", "noopener");
@@ -14,14 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open(
       "https://www.linkedin.com/in/vincematolka",
       "_blank",
-      "noopener"
+      "noopener",
     );
   });
   document.querySelector("#monkeyType").addEventListener("click", () => {
     window.open(
       "https://monkeytype.com/profile/matolkaVince",
       "_blank",
-      "noopener"
+      "noopener",
     );
   });
 
@@ -93,40 +86,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const fader = document.getElementsByClassName("fadeIn");
   let started = false;
   let running = false;
-  function halfSize() {
-    const r = mover.getBoundingClientRect();
-    return { hw: r.width / 2, hh: r.height / 2 };
-  }
-  let x = innerWidth / 2; // centering
-  let y = innerHeight / 2;
-  let tx = x;
-  let ty = y;
+  let rafId = 0;
+  const ease = 0.02;
+  const lift = 25; // screen percentage
+  let yOff = 0;
+  let tyOff = 0;
   function applyTransform() {
-    const { hw, hh } = halfSize();
-    mover.style.transform = `translate(${x - hw}px, ${y - hh}px)`;
+    mover.style.transform = `translate(-50%, -50%) translateY(${yOff}vh)`;
   }
+  // ensure correct initial
   applyTransform();
-  function onFirstMouseMove() {
+  function startIntro() {
     if (started) return;
     started = true;
-    const margin = 200;
-    tx = 2 * margin;
-    ty = margin;
+    tyOff = -lift;
+    setTimeout(() => {
+      Array.from(fader).forEach((el) => el.classList.add("show"));
+    }, 120);
     startLoop();
-    Array.from(fader).forEach((el) => el.classList.add("show"));
-    window.removeEventListener("mousemove", onFirstMouseMove);
+    window.removeEventListener("mousemove", startIntro);
   }
-  window.addEventListener("mousemove", onFirstMouseMove, { passive: true });
-  const ease = 0.025; // speed
-  let rafId = 0;
+  window.addEventListener("mousemove", startIntro, { passive: true });
   function loop() {
     running = true;
-    x += (tx - x) * ease;
-    y += (ty - y) * ease;
+    yOff += (tyOff - yOff) * ease;
     applyTransform();
-    if (Math.hypot(tx - x, ty - y) < 0.5) {
+    if (Math.abs(tyOff - yOff) < 0.5) {
       running = false;
-      cancelAnimationFrame(rafId);
       return;
     }
     rafId = requestAnimationFrame(loop);
