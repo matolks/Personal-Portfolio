@@ -7,12 +7,38 @@
 :root {
     --background-color: #0e0e0e;
     --foreground-color: #222222;
+    --base-fill: #141414;
+    --wave-fill: #222222;
     --list-color: #111111;
     --light-foreground: #919191;
     --font-color: #d2d2d2;
     --list-font-color: #9a9a9a;
 }
- 
+
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+    opacity: 1;
+}
+
+/*Background*/
+svg {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+}
+
+.shape {
+    fill: var(--base-fill);
+    transition: transform 0.4s ease, fill 0.4s ease;
+}
+
 body {
     color: var(--font-color); 
     font-family: 'Poppins', "sans-serif";
@@ -28,15 +54,10 @@ body {
     position: fixed;
 }
 
-img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-canvas {
-    max-width: 100%;
-    max-height: 100%;
-    opacity: 1;
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
 }
 
 /*Name w/ Wiggle*/

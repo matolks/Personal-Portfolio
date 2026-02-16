@@ -21,11 +21,25 @@ document.addEventListener("DOMContentLoaded", () => {
   //////// YELLOW WIGGLE //////////
   const canvas = document.getElementById("wiggle");
   const ctx = canvas.getContext("2d");
-  const W = canvas.width,
-    H = canvas.height;
-  const pad = 7.5;
-  const innerW = W - 2 * pad;
-  const innerH = H - 2 * pad;
+  let W = 0,
+    H = 0,
+    pad = 7.5,
+    innerW = 0,
+    innerH = 0;
+  function resizeWiggleCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS
+    W = rect.width;
+    H = rect.height;
+
+    innerW = W - 2 * pad;
+    innerH = H - 2 * pad;
+  }
+  resizeWiggleCanvas();
+  window.addEventListener("resize", resizeWiggleCanvas);
   const segments = 9; // # of wiggles
   const amp = 0.015;
   function drawBorder(time) {
@@ -86,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const fader = document.getElementsByClassName("fadeIn");
   let started = false;
   let running = false;
-  let rafId = 0;
   const ease = 0.02;
   const lift = 25; // screen percentage
   let yOff = 0;
@@ -115,9 +128,61 @@ document.addEventListener("DOMContentLoaded", () => {
       running = false;
       return;
     }
-    rafId = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   }
   function startLoop() {
-    if (!running) rafId = requestAnimationFrame(loop);
+    if (!running) requestAnimationFrame(loop);
   }
 });
+
+////// BACKGROUND //////
+const svg = document.getElementById("bg");
+const width = 3840;
+const height = 2160;
+const shapeCount = 250;
+const shapes = [];
+function random(min, max) {
+  // for random positioning
+  return Math.random() * (max - min) + min;
+}
+// Add shapes, maybe only keep circles
+for (let i = 0; i < shapeCount; i++) {
+  const size = random(20, 90);
+  const x = random(0, width);
+  const y = random(0, height);
+  let el;
+  el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  el.setAttribute("cx", x);
+  el.setAttribute("cy", y);
+  el.setAttribute("r", size / 2);
+  el.classList.add("shape");
+  svg.appendChild(el);
+  shapes.push({
+    el: el,
+    baseX: x,
+  });
+}
+let start = null;
+//Adjust -> maybe add a second wave
+const duration = 12000; // wave timeing
+const waveWidth = 400; // wave size
+function animate(timestamp) {
+  if (!start) start = timestamp; // heartbeat
+  const elapsed = (timestamp - start) / 1000;
+  const speed = width / (duration / 1000);
+  const wavePosition =
+    ((elapsed * speed) % (width + waveWidth * 2)) - waveWidth;
+  const rootStyles = getComputedStyle(document.documentElement);
+  const baseFill = rootStyles.getPropertyValue("--base-fill");
+  const waveFill = rootStyles.getPropertyValue("--wave-fill");
+  shapes.forEach((shape) => {
+    const distance = Math.abs(shape.baseX - wavePosition);
+    const influence = Math.max(0, 1 - distance / waveWidth); // wave effect
+    const eased = Math.sin((influence * Math.PI) / 2); // maybe adjust
+    const scale = 1 + eased * 0.04; // how *big* the wave is visually
+    shape.el.style.transform = `scale(${scale})`;
+    shape.el.style.fill = eased > 0 ? waveFill : baseFill;
+  });
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
